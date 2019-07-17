@@ -1,11 +1,17 @@
 from os import path
 import numpy
+import platform
 from setuptools import setup, Extension
 from Cython.Distutils import build_ext
 from Cython.Build import cythonize
 
 
 here = path.abspath(path.dirname(__file__))
+if platform.system() == "Darwin":
+    compile_extra_args = ['-std=c++11', "-mmacosx-version-min=10.14"]
+else:
+    compile_extra_args = ['-std=c++0x', '-Os']
+
 # Get the long description from the README file
 with open(path.join(here, 'README.md')) as f:
     long_description = f.read()
@@ -15,7 +21,7 @@ ext_utils = Extension('sparse_dot_topn.sparse_dot_topn',
                       sources=['./sparse_dot_topn/sparse_dot_topn.pyx', './sparse_dot_topn/sparse_dot_topn_source.cpp'],
                       include_dirs=[numpy.get_include()],
                       #libraries=[],
-                      extra_compile_args=['-std=c++0x', '-Os'],
+                      extra_compile_args=compile_extra_args,
                       language='c++',
                      )
 
@@ -40,4 +46,3 @@ setup(
     cmdclass={'build_ext': build_ext},
     ext_modules=cythonize([ext_utils]),
 )
-
